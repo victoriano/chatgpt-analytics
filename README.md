@@ -53,15 +53,42 @@ bun run dev
 
 # Build for production
 bun run build
+
+# Serve locally (for testing the built app)
+bunx serve dist -p 8000
 ```
 
 ## Deployment
 
+### Deploy to Vercel (Recommended)
+
 This app is optimized for deployment on Vercel:
 
-1. Connect your GitHub repository to Vercel
-2. Deploy with default settings
-3. The app will be available at your Vercel URL
+1. **Connect Repository**: 
+   - Connect your GitHub repository to Vercel
+   - Or use Vercel CLI: `bunx vercel`
+
+2. **Deploy**:
+   - Vercel will automatically detect the Vite project
+   - Build command: `bun run build`
+   - Output directory: `dist`
+   - The CORS headers in `vercel.json` are required for DuckDB WASM
+
+3. **Access**: Your app will be available at your Vercel URL
+
+### Local Testing
+
+To test the production build locally:
+
+```bash
+# Build the app
+bun run build
+
+# Serve the built files
+bunx serve dist -p 8000
+
+# Open http://localhost:8000
+```
 
 ## Privacy & Security
 
