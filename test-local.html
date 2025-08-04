@@ -88,11 +88,11 @@
                     // Test the problematic query
                     const result = await conn.query(`
                         SELECT 
-                            strftime('%Y-%m-%d', to_timestamp(create_time)) as date,
+                            strftime('%Y-%m-%d', to_timestamp(create_time)::TIMESTAMP) as date,
                             COUNT(*) as conversations
                         FROM conversations
                         WHERE create_time > 0
-                        GROUP BY strftime('%Y-%m-%d', to_timestamp(create_time))
+                        GROUP BY strftime('%Y-%m-%d', to_timestamp(create_time)::TIMESTAMP)
                         ORDER BY date
                     `);
 
