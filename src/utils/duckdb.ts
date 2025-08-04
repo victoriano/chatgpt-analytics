@@ -54,50 +54,73 @@ export const processConversationsWithDuckDB = async (
     )
   `)
 
-  // Insert conversation data using prepared statements
-  const insertConvStmt = await conn.prepare(`
-    INSERT INTO conversations VALUES ($1, $2, $3, $4, $5, $6)
-  `)
+  // Process conversations in batches to prevent memory overflow
+  const BATCH_SIZE = 50
+  const totalConvCount = conversations.length
   
-  const insertMsgStmt = await conn.prepare(`
-    INSERT INTO messages VALUES ($1, $2, $3, $4, $5, $6, $7)
-  `)
+  for (let i = 0; i < totalConvCount; i += BATCH_SIZE) {
+    const batch = conversations.slice(i, i + BATCH_SIZE)
+    
+    // Insert conversations batch
+    const insertConvStmt = await conn.prepare(`
+      INSERT INTO conversations VALUES ($1, $2, $3, $4, $5, $6)
+    `)
+    
+    const insertMsgStmt = await conn.prepare(`
+      INSERT INTO messages VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `)
 
-  for (const conv of conversations) {
-    await insertConvStmt.query(
-      conv.id,
-      conv.title || '',
-      conv.create_time,
-      conv.update_time,
-      conv.is_archived,
-      conv.default_model_slug || ''
-    )
+    for (const conv of batch) {
+      await insertConvStmt.query(
+        conv.id,
+        conv.title || '',
+        conv.create_time,
+        conv.update_time,
+        conv.is_archived,
+        conv.default_model_slug || ''
+      )
 
-    // Extract and insert messages
-    let messageIndex = 0
-    for (const nodeId of Object.keys(conv.mapping)) {
-      const node = conv.mapping[nodeId]
-      if (node.message && node.message.author && node.message.content) {
-        const message = node.message
-        const contentText = extractMessageContent(message)
+      // Extract and insert messages (limit to prevent memory issues)
+      let messageIndex = 0
+      const mappingKeys = Object.keys(conv.mapping)
+      
+      // Process messages in smaller chunks within each conversation
+      for (let j = 0; j < mappingKeys.length && messageIndex < 100; j++) {
+        const nodeId = mappingKeys[j]
+        const node = conv.mapping[nodeId]
         
-        if (contentText && message.author.role !== 'system') {
-          await insertMsgStmt.query(
-            message.id,
-            conv.id,
-            message.author.role,
-            message.create_time || 0,
-            message.content.content_type,
-            contentText,
-            messageIndex++
-          )
+        if (node.message && node.message.author && node.message.content) {
+          const message = node.message
+          const contentText = extractMessageContent(message)
+          
+          if (contentText && message.author.role !== 'system') {
+            // Truncate very long content to prevent memory issues
+            const truncatedContent = contentText.length > 1000 
+              ? contentText.substring(0, 1000) + '...' 
+              : contentText
+              
+            await insertMsgStmt.query(
+              message.id,
+              conv.id,
+              message.author.role,
+              message.create_time || 0,
+              message.content.content_type,
+              truncatedContent,
+              messageIndex++
+            )
+          }
         }
       }
     }
+    
+    await insertConvStmt.close()
+    await insertMsgStmt.close()
+    
+    // Force garbage collection between batches
+    if (typeof gc !== 'undefined') {
+      gc()
+    }
   }
-  
-  await insertConvStmt.close()
-  await insertMsgStmt.close()
 
   // Calculate statistics using SQL
   const totalConversationsResult = await conn.query('SELECT COUNT(*) as count FROM conversations')
