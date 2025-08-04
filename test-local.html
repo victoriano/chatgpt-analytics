@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local DuckDB Test</title>
+</head>
+<body>
+    <h1>DuckDB Local Test</h1>
+    <button onclick="testDuckDB()">Test DuckDB Processing</button>
+    <div id="output"></div>
+
+    <script type="module">
+        import * as duckdb from '@duckdb/duckdb-wasm';
+
+        window.testDuckDB = async function() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>Testing DuckDB WASM...</p>';
+
+            try {
+                // Initialize DuckDB
+                const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
+                const bundle = await duckdb.selectBundle(JSDELIVR_BUNDLES);
+                
+                const workerResponse = await fetch(bundle.mainWorker);
+                const workerScript = await workerResponse.text();
+                const workerBlob = new Blob([workerScript], { type: 'application/javascript' });
+                const workerUrl = URL.createObjectURL(workerBlob);
+                
+                const worker = new Worker(workerUrl);
+                const logger = new duckdb.ConsoleLogger();
+                const db = new duckdb.AsyncDuckDB(logger, worker);
+                await db.instantiate(bundle.mainModule);
+                const conn = await db.connect();
+                
+                output.innerHTML += '<p>✅ DuckDB initialized</p>';
+
+                // Test datetime functions
+                try {
+                    await conn.query('SELECT to_timestamp(1704067200) as test_date');
+                    output.innerHTML += '<p>✅ to_timestamp function works</p>';
+                } catch (e) {
+                    output.innerHTML += `<p>❌ to_timestamp failed: ${e.message}</p>`;
+                }
+
+                try {
+                    await conn.query("SELECT strftime('%Y-%m-%d', to_timestamp(1704067200)) as formatted_date");
+                    output.innerHTML += '<p>✅ strftime with to_timestamp works</p>';
+                } catch (e) {
+                    output.innerHTML += `<p>❌ strftime failed: ${e.message}</p>`;
+                }
+
+                // Load and test sample data
+                try {
+                    const response = await fetch('./test-conversations-sample.json');
+                    const conversations = await response.json();
+                    
+                    output.innerHTML += `<p>✅ Loaded ${conversations.length} sample conversations</p>`;
+
+                    // Create test tables
+                    await conn.query(`
+                        CREATE TABLE conversations (
+                            id VARCHAR,
+                            title VARCHAR,
+                            create_time DOUBLE,
+                            update_time DOUBLE,
+                            is_archived BOOLEAN,
+                            default_model_slug VARCHAR
+                        )
+                    `);
+
+                    // Insert sample data
+                    const insertStmt = await conn.prepare('INSERT INTO conversations VALUES ($1, $2, $3, $4, $5, $6)');
+                    for (const conv of conversations) {
+                        await insertStmt.query(
+                            conv.id,
+                            conv.title || '',
+                            conv.create_time,
+                            conv.update_time,
+                            conv.is_archived,
+                            conv.default_model_slug || ''
+                        );
+                    }
+                    await insertStmt.close();
+
+                    output.innerHTML += '<p>✅ Sample data inserted</p>';
+
+                    // Test the problematic query
+                    const result = await conn.query(`
+                        SELECT 
+                            strftime('%Y-%m-%d', to_timestamp(create_time)) as date,
+                            COUNT(*) as conversations
+                        FROM conversations
+                        WHERE create_time > 0
+                        GROUP BY strftime('%Y-%m-%d', to_timestamp(create_time))
+                        ORDER BY date
+                    `);
+
+                    output.innerHTML += `<p>✅ Query successful! Results: ${result.numRows} rows</p>`;
+                    
+                    // Display results
+                    const rows = result.toArray();
+                    rows.forEach(row => {
+                        output.innerHTML += `<p>Date: ${row.date}, Conversations: ${row.conversations}</p>`;
+                    });
+
+                } catch (e) {
+                    output.innerHTML += `<p>❌ Sample data test failed: ${e.message}</p>`;
+                }
+
+                await conn.close();
+                await db.terminate();
+                URL.revokeObjectURL(workerUrl);
+
+            } catch (error) {
+                output.innerHTML += `<p>❌ Test failed: ${error.message}</p>`;
+                console.error('Test error:', error);
+            }
+        };
+    </script>
+</body>
+</html>

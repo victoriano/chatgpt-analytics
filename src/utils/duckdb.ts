@@ -138,7 +138,7 @@ export const processConversationsWithDuckDB = async (
 
   const dailyStatsResult = await conn.query(`
     SELECT 
-      strftime('%Y-%m-%d', datetime(c.create_time, 'unixepoch')) as date,
+      strftime('%Y-%m-%d', to_timestamp(c.create_time)) as date,
       COUNT(DISTINCT c.id) as conversations,
       COUNT(m.id) as messages,
       COUNT(CASE WHEN m.author_role = 'user' THEN 1 END) as user_messages,
@@ -146,13 +146,13 @@ export const processConversationsWithDuckDB = async (
     FROM conversations c
     LEFT JOIN messages m ON c.id = m.conversation_id
     WHERE c.create_time > 0
-    GROUP BY strftime('%Y-%m-%d', datetime(c.create_time, 'unixepoch'))
+    GROUP BY strftime('%Y-%m-%d', to_timestamp(c.create_time))
     ORDER BY date
   `)
 
   const monthlyStatsResult = await conn.query(`
     SELECT 
-      strftime('%Y-%m', datetime(c.create_time, 'unixepoch')) as month,
+      strftime('%Y-%m', to_timestamp(c.create_time)) as month,
       COUNT(DISTINCT c.id) as conversations,
       COUNT(m.id) as messages,
       COUNT(CASE WHEN m.author_role = 'user' THEN 1 END) as user_messages,
@@ -160,7 +160,7 @@ export const processConversationsWithDuckDB = async (
     FROM conversations c
     LEFT JOIN messages m ON c.id = m.conversation_id
     WHERE c.create_time > 0
-    GROUP BY strftime('%Y-%m', datetime(c.create_time, 'unixepoch'))
+    GROUP BY strftime('%Y-%m', to_timestamp(c.create_time))
     ORDER BY month
   `)
 
