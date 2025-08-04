@@ -192,11 +192,19 @@ export const processConversationsWithDuckDB = async (
     LIMIT 1
   `)
 
+  // Helper function to convert BigInt to number safely
+  const safeNumber = (value: unknown): number => {
+    if (typeof value === 'bigint') {
+      return Number(value)
+    }
+    return typeof value === 'number' ? value : 0
+  }
+
   // Process results
-  const totalConversations = totalConversationsResult.get(0)?.count || 0
-  const totalMessages = totalMessagesResult.get(0)?.count || 0
-  const totalUserMessages = userMessagesResult.get(0)?.count || 0
-  const totalAssistantMessages = assistantMessagesResult.get(0)?.count || 0
+  const totalConversations = safeNumber(totalConversationsResult.get(0)?.count) || 0
+  const totalMessages = safeNumber(totalMessagesResult.get(0)?.count) || 0
+  const totalUserMessages = safeNumber(userMessagesResult.get(0)?.count) || 0
+  const totalAssistantMessages = safeNumber(assistantMessagesResult.get(0)?.count) || 0
 
   const dateRange = dateRangeResult.get(0)
   const earliest = dateRange?.earliest ? new Date(dateRange.earliest * 1000) : new Date()
@@ -204,32 +212,32 @@ export const processConversationsWithDuckDB = async (
 
   const dailyStats = dailyStatsResult.toArray().map(row => ({
     date: row.date,
-    conversations: row.conversations || 0,
-    messages: row.messages || 0,
-    userMessages: row.user_messages || 0,
-    assistantMessages: row.assistant_messages || 0
+    conversations: safeNumber(row.conversations),
+    messages: safeNumber(row.messages),
+    userMessages: safeNumber(row.user_messages),
+    assistantMessages: safeNumber(row.assistant_messages)
   }))
 
   const monthlyStats = monthlyStatsResult.toArray().map(row => ({
     month: row.month,
-    conversations: row.conversations || 0,
-    messages: row.messages || 0,
-    userMessages: row.user_messages || 0,
-    assistantMessages: row.assistant_messages || 0
+    conversations: safeNumber(row.conversations),
+    messages: safeNumber(row.messages),
+    userMessages: safeNumber(row.user_messages),
+    assistantMessages: safeNumber(row.assistant_messages)
   }))
 
   const modelStats: Record<string, number> = {}
   modelStatsResult.toArray().forEach(row => {
     if (row.default_model_slug) {
-      modelStats[row.default_model_slug] = row.count
+      modelStats[row.default_model_slug] = safeNumber(row.count)
     }
   })
 
-  const averageMessagesPerConversation = avgMessagesResult.get(0)?.avg_count || 0
+  const averageMessagesPerConversation = safeNumber(avgMessagesResult.get(0)?.avg_count) || 0
   const longestConv = longestConvResult.get(0)
   const longestConversation = {
     title: longestConv?.title || 'N/A',
-    messageCount: longestConv?.message_count || 0
+    messageCount: safeNumber(longestConv?.message_count) || 0
   }
 
   return {

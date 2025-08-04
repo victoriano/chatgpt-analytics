@@ -3,7 +3,7 @@ export interface Message {
   author: {
     role: 'user' | 'assistant' | 'system' | 'tool'
     name?: string
-    metadata?: any
+    metadata?: Record<string, unknown>
   }
   create_time?: number
   update_time?: number
@@ -15,7 +15,7 @@ export interface Message {
   status?: string
   end_turn?: boolean
   weight?: number
-  metadata?: any
+  metadata?: Record<string, unknown>
   recipient?: string
   channel?: string
 }
@@ -40,7 +40,7 @@ export interface Conversation {
   default_model_slug?: string
   conversation_origin?: string
   gizmo_id?: string
-  moderation_results?: any[]
+  moderation_results?: Record<string, unknown>[]
 }
 
 export interface ConversationData {
