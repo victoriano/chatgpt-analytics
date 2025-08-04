@@ -36,7 +36,53 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
     ].map(row => row.join(',')).join('\n')
 
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8' })
-    saveAs(blob, 'chatgpt-analytics.csv')
+    saveAs(blob, 'chatgpt-analytics-summary.csv')
+  }
+
+  const exportMessages = () => {
+    const csvData = [
+      ['Conversation ID', 'Conversation Title', 'Message ID', 'Timestamp', 'Author', 'Content'],
+      ...data.conversations.flatMap(conv => 
+        Object.values(conv.mapping)
+          .filter(node => node.message && node.message.author && node.message.content)
+          .map(node => {
+            const message = node.message!
+            const timestamp = message.create_time 
+              ? new Date(message.create_time * 1000).toISOString()
+              : ''
+            
+            const content = message.content.parts?.join(' ') || message.content.text || ''
+            const cleanContent = content
+              .replace(/"/g, '""')
+              .replace(/\n/g, ' ')
+              .replace(/\r/g, ' ')
+              .replace(/\t/g, ' ')
+              .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+              .trim()
+            
+            const cleanTitle = (conv.title || 'Untitled')
+              .replace(/"/g, '""')
+              .replace(/\n/g, ' ')
+              .replace(/\r/g, ' ')
+              .replace(/\t/g, ' ')
+              .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+              .trim()
+            
+            return [
+              conv.id,
+              `"${cleanTitle}"`,
+              message.id,
+              timestamp,
+              message.author.role,
+              `"${cleanContent}"`
+            ]
+          })
+      )
+    ].map(row => row.join(',')).join('\n')
+
+    const bom = '\uFEFF'
+    const blob = new Blob([bom + csvData], { type: 'text/csv;charset=utf-8' })
+    saveAs(blob, 'chatgpt-messages.csv')
   }
 
   // Prepare model data for pie chart
@@ -59,13 +105,26 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
           </p>
         </div>
         <div className="flex space-x-3">
-          <button
-            onClick={exportData}
-            className="btn btn-outline btn-primary"
-          >
-            <Download className="h-4 w-4" />
-            Export CSV
-          </button>
+          <div className="dropdown dropdown-end">
+            <div tabIndex={0} role="button" className="btn btn-outline btn-primary">
+              <Download className="h-4 w-4" />
+              Export Data
+            </div>
+            <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+              <li>
+                <a onClick={exportData}>
+                  <Download className="h-4 w-4" />
+                  Summary Report
+                </a>
+              </li>
+              <li>
+                <a onClick={exportMessages}>
+                  <Download className="h-4 w-4" />
+                  Message Dataset
+                </a>
+              </li>
+            </ul>
+          </div>
           <button
             onClick={onReset}
             className="btn btn-secondary"
