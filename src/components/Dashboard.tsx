@@ -41,11 +41,22 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
 
   const exportMessages = () => {
     const csvData = [
-      ['Conversation ID', 'Conversation Title', 'Message ID', 'Timestamp', 'Author', 'Content'],
+      ['Conversation ID', 'Conversation Title', 'Message ID', 'Timestamp', 'Author', 'Model', 'Content Type', 'Content Length', 'Message Index', 'Is Archived', 'Content'],
       ...data.conversations.flatMap(conv => 
         Object.values(conv.mapping)
-          .filter(node => node.message && node.message.author && node.message.content)
-          .map(node => {
+          .filter(node => {
+            if (!node.message || !node.message.author || !node.message.content) return false
+            
+            const message = node.message
+            const content = message.content.parts?.join(' ') || message.content.text || ''
+            
+            // Only include messages with actual content and valid timestamps
+            return content.trim().length > 0 && 
+                   message.create_time && 
+                   message.create_time > 0 &&
+                   (message.author.role === 'user' || message.author.role === 'assistant')
+          })
+          .map((node, index) => {
             const message = node.message!
             const timestamp = message.create_time 
               ? new Date(message.create_time * 1000).toISOString()
@@ -74,6 +85,11 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
               message.id,
               timestamp,
               message.author.role,
+              conv.default_model_slug || 'unknown',
+              message.content.content_type || 'text',
+              cleanContent.length,
+              index + 1,
+              conv.is_archived ? 'true' : 'false',
               `"${cleanContent}"`
             ]
           })
