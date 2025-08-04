@@ -1,0 +1,32 @@
+[{
+  "id": "test-123",
+  "title": "Test conversation with 'quotes' and special chars: åOFùJGù",
+  "create_time": 1704067200,
+  "update_time": 1704067300,
+  "is_archived": false,
+  "default_model_slug": "gpt-4",
+  "mapping": {
+    "node1": {
+      "message": {
+        "id": "msg-1",
+        "author": {"role": "user"},
+        "create_time": 1704067200,
+        "content": {
+          "content_type": "text",
+          "parts": ["This is a test message with 'quotes' and special characters: åOFùJGù"]
+        }
+      }
+    },
+    "node2": {
+      "message": {
+        "id": "msg-2", 
+        "author": {"role": "assistant"},
+        "create_time": 1704067250,
+        "content": {
+          "content_type": "text",
+          "parts": ["This is a response with \"double quotes\" and more special chars"]
+        }
+      }
+    }
+  }
+}]
