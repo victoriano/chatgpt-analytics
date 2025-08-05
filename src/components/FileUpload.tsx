@@ -7,9 +7,10 @@ interface FileUploadProps {
   onDataLoaded: (data: ConversationData) => void
   isLoading: boolean
   setIsLoading: (loading: boolean) => void
+  onLoadDemo: () => Promise<void>
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded, isLoading, setIsLoading }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded, isLoading, setIsLoading, onLoadDemo }) => {
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState<string>('')
@@ -124,7 +125,17 @@ const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded, isLoading, setIsL
                   Upload your ChatGPT conversations.json file
                 </p>
                 <p className="text-base text-gray-500 leading-relaxed">
-                  Drag and drop or click to select your ChatGPT export file
+                  Drag and drop or click to select your ChatGPT export file or{' '}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onLoadDemo()
+                    }}
+                    disabled={isLoading}
+                    className="text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed underline font-medium"
+                  >
+                    try with demo data
+                  </button>
                 </p>
               </div>
             </>

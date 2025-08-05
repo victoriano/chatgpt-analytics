@@ -1,12 +1,61 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import FileUpload from './components/FileUpload'
 import Dashboard from './components/Dashboard'
 import type { ConversationData } from './types'
+import { initializeDuckDB, processConversationsWithDuckDB } from './utils/duckdb'
 import './App.css'
 
 function App() {
   const [conversationData, setConversationData] = useState<ConversationData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  const loadDemo = async (showErrors = true) => {
+    setIsLoading(true)
+    try {
+      // Add timeout to prevent hanging
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+      
+      const response = await fetch('/demo-data.json', { 
+        signal: controller.signal 
+      })
+      clearTimeout(timeoutId)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const demoData = await response.json()
+      
+      await initializeDuckDB()
+      const processedData = await processConversationsWithDuckDB(demoData)
+      setConversationData(processedData)
+      
+      // Update URL to include demo parameter
+      const url = new URL(window.location.href)
+      url.searchParams.set('demo', 'true')
+      window.history.pushState({}, '', url)
+    } catch (error) {
+      console.error('Error loading demo data:', error)
+      // Only show alert if explicitly requested (manual demo clicks)
+      if (showErrors) {
+        console.warn('Demo data failed to load. Please try uploading your own file.')
+      }
+      // Clear demo parameter from URL if it failed
+      const url = new URL(window.location.href)
+      url.searchParams.delete('demo')
+      window.history.pushState({}, '', url)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Check for demo parameter on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('demo') === 'true' && !conversationData && !isLoading) {
+      loadDemo(false) // Don't show errors for URL-triggered demo loads
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -14,7 +63,13 @@ function App() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 mb-4 flex items-center justify-center gap-4">
             <button 
-              onClick={() => setConversationData(null)}
+              onClick={() => {
+                setConversationData(null)
+                // Clear demo parameter from URL
+                const url = new URL(window.location.href)
+                url.searchParams.delete('demo')
+                window.history.pushState({}, '', url)
+              }}
               className="flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <img src="/logo.svg" alt="ChatGPT Analytics Logo" className="h-12 w-12" />
@@ -57,11 +112,18 @@ function App() {
             onDataLoaded={setConversationData}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
+            onLoadDemo={loadDemo}
           />
         ) : (
           <Dashboard 
             data={conversationData}
-            onReset={() => setConversationData(null)}
+            onReset={() => {
+              setConversationData(null)
+              // Clear demo parameter from URL
+              const url = new URL(window.location.href)
+              url.searchParams.delete('demo')
+              window.history.pushState({}, '', url)
+            }}
           />
         )}
       </div>
