@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { FileText, AlertCircle } from 'lucide-react'
+import { FileText, AlertCircle, Settings, Download, Mail, FolderOpen, ExternalLink } from 'lucide-react'
 import type { Conversation, ConversationData } from '../types'
 import { initializeDuckDB, processConversationsWithDuckDB } from '../utils/duckdb'
 
@@ -144,15 +144,72 @@ const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded, isLoading, setIsL
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 mt-8">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">How to get your ChatGPT data:</h3>
-          <ol className="list-decimal list-inside space-y-3 text-gray-600">
-            <li className="pl-2">Go to ChatGPT Settings → Data controls</li>
-            <li className="pl-2">Click "Export data"</li>
-            <li className="pl-2">Wait for the email with your data export</li>
-            <li className="pl-2">Extract the ZIP file and upload the conversations.json file here</li>
-          </ol>
+      <div className="mt-8">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">How to get your ChatGPT data:</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Step 1 */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <Settings className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="space-y-2">
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold">1</span>
+                <h4 className="font-medium text-gray-900">Access Settings</h4>
+                <p className="text-sm text-gray-600">Go to ChatGPT Settings → Data controls</p>
+                <a 
+                  href="https://chatgpt.com/#settings/DataControls" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-xs text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Open Settings <ExternalLink className="h-3 w-3 ml-1" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="p-3 bg-green-50 rounded-lg">
+                <Download className="h-6 w-6 text-green-600" />
+              </div>
+              <div className="space-y-2">
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-green-100 text-green-600 rounded-full text-sm font-semibold">2</span>
+                <h4 className="font-medium text-gray-900">Export Data</h4>
+                <p className="text-sm text-gray-600">Click "Export data" button</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="p-3 bg-purple-50 rounded-lg">
+                <Mail className="h-6 w-6 text-purple-600" />
+              </div>
+              <div className="space-y-2">
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-purple-100 text-purple-600 rounded-full text-sm font-semibold">3</span>
+                <h4 className="font-medium text-gray-900">Wait for Email</h4>
+                <p className="text-sm text-gray-600">Check your inbox for the data export email</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 4 */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="p-3 bg-orange-50 rounded-lg">
+                <FolderOpen className="h-6 w-6 text-orange-600" />
+              </div>
+              <div className="space-y-2">
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-orange-100 text-orange-600 rounded-full text-sm font-semibold">4</span>
+                <h4 className="font-medium text-gray-900">Extract & Upload</h4>
+                <p className="text-sm text-gray-600">Extract ZIP and upload conversations.json here</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
