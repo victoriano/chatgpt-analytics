@@ -197,13 +197,15 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-orange-50 rounded-lg">
+            <div className="p-3 bg-orange-50 rounded-lg flex-shrink-0">
               <Brain className="h-8 w-8 text-orange-600" />
             </div>
-            <div className="ml-4">
+            <div className="ml-4 min-w-0 flex-1">
               <p className="text-sm font-medium text-gray-500">Longest Conversation</p>
               <p className="text-2xl font-bold text-gray-900">{data.longestConversation.messageCount}</p>
-              <p className="text-xs text-gray-400 truncate mt-1">{data.longestConversation.title}</p>
+              <p className="text-xs text-gray-400 truncate mt-1 max-w-full" title={data.longestConversation.title}>
+                {data.longestConversation.title}
+              </p>
             </div>
           </div>
         </div>
