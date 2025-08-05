@@ -30,6 +30,10 @@ export const processConversationsWithDuckDB = async (
 ): Promise<ConversationData> => {
   if (!conn) throw new Error('DuckDB not initialized')
 
+  // Drop existing tables if they exist
+  await conn.query(`DROP TABLE IF EXISTS messages`)
+  await conn.query(`DROP TABLE IF EXISTS conversations`)
+
   // Create tables
   await conn.query(`
     CREATE TABLE conversations (
