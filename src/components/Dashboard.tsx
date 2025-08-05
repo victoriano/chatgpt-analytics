@@ -113,39 +113,45 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
         <div>
-          <h2 className="text-3xl font-bold text-primary">Your ChatGPT Analytics</h2>
-          <p className="text-base-content/70 text-lg">
+          <h2 className="text-3xl font-bold text-gray-900">Your ChatGPT Analytics</h2>
+          <p className="text-gray-600 text-lg mt-2">
             Data from {data.dateRange.earliest.toLocaleDateString()} to {data.dateRange.latest.toLocaleDateString()}
           </p>
         </div>
-        <div className="flex space-x-3">
-          <div className="dropdown dropdown-end">
-            <div tabIndex={0} role="button" className="btn btn-outline btn-primary">
-              <Download className="h-4 w-4" />
-              Export Data
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative">
+            <div className="group">
+              <button className="flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors">
+                <Download className="h-4 w-4 mr-2" />
+                Export Data
+              </button>
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                <div className="py-2">
+                  <button
+                    onClick={exportData}
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Summary Report
+                  </button>
+                  <button
+                    onClick={exportMessages}
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Message Dataset
+                  </button>
+                </div>
+              </div>
             </div>
-            <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-              <li>
-                <a onClick={exportData}>
-                  <Download className="h-4 w-4" />
-                  Summary Report
-                </a>
-              </li>
-              <li>
-                <a onClick={exportMessages}>
-                  <Download className="h-4 w-4" />
-                  Message Dataset
-                </a>
-              </li>
-            </ul>
           </div>
           <button
             onClick={onReset}
-            className="btn btn-secondary"
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            <RotateCcw className="h-4 w-4" />
+            <RotateCcw className="h-4 w-4 mr-2" />
             Upload New File
           </button>
         </div>
@@ -153,60 +159,60 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <div className="flex items-center">
-              <MessageSquare className="h-10 w-10 text-primary" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-base-content/60">Total Conversations</p>
-                <p className="text-3xl font-bold text-base-content">{data.totalConversations.toLocaleString()}</p>
-              </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-blue-50 rounded-lg">
+              <MessageSquare className="h-8 w-8 text-blue-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Total Conversations</p>
+              <p className="text-2xl font-bold text-gray-900">{data.totalConversations.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <div className="flex items-center">
-              <Calendar className="h-10 w-10 text-secondary" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-base-content/60">Total Messages</p>
-                <p className="text-3xl font-bold text-base-content">{data.totalMessages.toLocaleString()}</p>
-              </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-green-50 rounded-lg">
+              <Calendar className="h-8 w-8 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Total Messages</p>
+              <p className="text-2xl font-bold text-gray-900">{data.totalMessages.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <div className="flex items-center">
-              <TrendingUp className="h-10 w-10 text-accent" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-base-content/60">Avg Messages/Conv</p>
-                <p className="text-3xl font-bold text-base-content">{data.averageMessagesPerConversation.toFixed(1)}</p>
-              </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-purple-50 rounded-lg">
+              <TrendingUp className="h-8 w-8 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Avg Messages/Conv</p>
+              <p className="text-2xl font-bold text-gray-900">{data.averageMessagesPerConversation.toFixed(1)}</p>
             </div>
           </div>
         </div>
 
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <div className="flex items-center">
-              <Brain className="h-10 w-10 text-warning" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-base-content/60">Longest Conversation</p>
-                <p className="text-3xl font-bold text-base-content">{data.longestConversation.messageCount}</p>
-                <p className="text-xs text-base-content/50 truncate">{data.longestConversation.title}</p>
-              </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-orange-50 rounded-lg">
+              <Brain className="h-8 w-8 text-orange-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Longest Conversation</p>
+              <p className="text-2xl font-bold text-gray-900">{data.longestConversation.messageCount}</p>
+              <p className="text-xs text-gray-400 truncate mt-1">{data.longestConversation.title}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Daily Activity Chart */}
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h3 className="card-title text-xl mb-4">Daily Activity (Last 30 Days)</h3>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-6">Daily Activity (Last 30 Days)</h3>
           <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={recentActivity}>
@@ -245,9 +251,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
       </div>
 
       {/* Monthly Trends */}
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h3 className="card-title text-xl mb-4">Monthly Trends</h3>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-6">Monthly Trends</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.monthlyStats}>
@@ -291,9 +297,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
       {/* Message Distribution and Model Usage */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Message Distribution */}
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h3 className="card-title text-xl mb-4">Message Distribution</h3>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">Message Distribution</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -321,9 +327,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
         </div>
 
         {/* Model Usage */}
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h3 className="card-title text-xl mb-4">Model Usage</h3>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">Model Usage</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -350,9 +356,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onReset }) => {
       </div>
 
       {/* Weekly Pattern */}
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h3 className="card-title text-xl mb-4">User vs Assistant Messages Over Time</h3>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-6">User vs Assistant Messages Over Time</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.monthlyStats}>

@@ -88,12 +88,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded, isLoading, setIsL
   }, [handleFiles])
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-3xl mx-auto">
       <div
         className={`
-          relative border-2 border-dashed rounded-lg p-8 text-center transition-colors card bg-base-100 shadow-xl
-          ${dragActive ? 'border-primary bg-primary/5' : 'border-base-300 hover:border-primary/50'}
-          ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+          relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-200 bg-white shadow-sm hover:shadow-md
+          ${dragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}
+          ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50'}
         `}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -110,20 +110,20 @@ const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded, isLoading, setIsL
           disabled={isLoading}
         />
         
-        <div className="space-y-4">
+        <div className="space-y-6">
           {isLoading ? (
             <div className="flex flex-col items-center space-y-4">
-              <div className="loading loading-spinner loading-lg text-primary"></div>
-              <p className="text-sm font-medium text-base-content/70">{progress}</p>
+              <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+              <p className="text-sm font-medium text-gray-600">{progress}</p>
             </div>
           ) : (
             <>
-              <FileText className="mx-auto h-16 w-16 text-primary/60" />
-              <div className="space-y-2">
-                <p className="text-xl font-semibold text-base-content">
+              <FileText className="mx-auto h-16 w-16 text-blue-400" />
+              <div className="space-y-3">
+                <p className="text-xl font-semibold text-gray-900">
                   Upload your ChatGPT conversations.json file
                 </p>
-                <p className="text-base text-base-content/60">
+                <p className="text-base text-gray-500 leading-relaxed">
                   Drag and drop or click to select your ChatGPT export file
                 </p>
               </div>
@@ -133,23 +133,25 @@ const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded, isLoading, setIsL
       </div>
 
       {error && (
-        <div className="alert alert-error mt-4">
-          <AlertCircle className="h-5 w-5" />
-          <div>
-            <h3 className="font-bold">Error</h3>
-            <div className="text-xs">{error}</div>
+        <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <AlertCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="font-semibold text-red-800">Error</h3>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
+            </div>
           </div>
         </div>
       )}
 
-      <div className="card bg-base-100 shadow-lg mt-6">
-        <div className="card-body">
-          <h3 className="card-title text-lg">How to get your ChatGPT data:</h3>
-          <ol className="list-decimal list-inside space-y-2 text-base-content/80">
-            <li>Go to ChatGPT Settings → Data controls</li>
-            <li>Click "Export data"</li>
-            <li>Wait for the email with your data export</li>
-            <li>Extract the ZIP file and upload the conversations.json file here</li>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 mt-8">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">How to get your ChatGPT data:</h3>
+          <ol className="list-decimal list-inside space-y-3 text-gray-600">
+            <li className="pl-2">Go to ChatGPT Settings → Data controls</li>
+            <li className="pl-2">Click "Export data"</li>
+            <li className="pl-2">Wait for the email with your data export</li>
+            <li className="pl-2">Extract the ZIP file and upload the conversations.json file here</li>
           </ol>
         </div>
       </div>

@@ -9,14 +9,14 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
 
   return (
-    <div className="min-h-screen bg-base-200 py-8">
+    <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-primary mb-6">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
             ChatGPT Analytics Dashboard
           </h1>
-          <p className="text-xl text-base-content/70 max-w-2xl mx-auto">
-            Upload your ChatGPT conversations.json file to visualize your usage statistics
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Upload your ChatGPT conversations.json file to visualize your usage statistics and gain insights into your AI interactions
           </p>
         </div>
 
