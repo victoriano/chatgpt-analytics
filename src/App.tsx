@@ -12,8 +12,14 @@ function App() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-            ChatGPT Analytics
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-4 flex items-center justify-center gap-4">
+            <button 
+              onClick={() => setConversationData(null)}
+              className="flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              <img src="/logo.svg" alt="ChatGPT Analytics Logo" className="h-12 w-12" />
+              ChatGPT Analytics
+            </button>
           </h1>
           <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
             Upload your ChatGPT conversations.json file to visualize your usage statistics and gain insights into your AI interactions. 
