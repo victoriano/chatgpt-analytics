@@ -1,5 +1,7 @@
 # ChatGPT Analytics Dashboard
 
+🚀 **Live Demo**: [https://my-chatgpt-data.vercel.app](https://my-chatgpt-data.vercel.app)
+
 A React-based dashboard for analyzing your ChatGPT conversation data. Upload your ChatGPT export file and get insights into your usage patterns, message statistics, and trends over time.
 
 ## Features
